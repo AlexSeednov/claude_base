@@ -1,0 +1,18 @@
+{
+  "name": "claude-base",
+  "owner": {
+    "name": "Alex Seednov"
+  },
+  "metadata": {
+    "description": "Shared Claude Code configuration for Flutter/Dart clean-architecture projects."
+  },
+  "plugins": [
+    {
+      "name": "flutter-base",
+      "source": "./plugin",
+      "description": "Test skills (unit, widget, integration, test doubles, coverage) and cross-platform Telegram notification hooks for the Flutter/Dart stack.",
+      "category": "development",
+      "keywords": ["flutter", "dart", "testing"]
+    }
+  ]
+}
