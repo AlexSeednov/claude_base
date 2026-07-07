@@ -7,6 +7,11 @@
 - Add `///` doc comments before **every** declaration — class, field, constructor, method (including `@override` ones like `build`), enum, and parameter — even if no explanation is needed (leave the comment empty `///` or with a single word). In the body of the comment, describe only the **WHY** when the reason is non-obvious (a constraint, a workaround, a hidden invariant). What the code does is explained by its names.
 - **Do not reference design tools in comments**: no Figma component/style/variant names, node IDs, links, or exported CSS-style property strings (e.g. `padding: 16px`, `backdropFilter: blur(25px)`). Describe intent in domain terms. A neutral phrase like "from the mockup" is allowed, but **don't add it where the design origin is self-evident** (e.g. layout dimension/spacing constants) — there it's redundant noise. Use it only when it conveys something non-obvious. Never name a Figma component.
 
+## Editing These Instructions
+
+- These instruction files (`global`, `architecture`, `dart-conventions`, `packages`, `layers`) live in the shared **`claude_base`** package, not in the projects that consume them. **Make every change to them in the package repo** — never in a project's vendored copy under `.claude/base/…`, which is a read-only mirror pulled in via `/plugin update`.
+- Editing the vendored copy inside a project is lost on the next update and never reaches a tag. Change the package, add a `CHANGELOG.md` entry, bump the version in `plugin/.claude-plugin/plugin.json`, and let the user push and tag; consuming projects then pick it up through `/plugin update`.
+
 ## Changelog
 
 - After any code change, add a brief line to `changelog.md` in the project root.
