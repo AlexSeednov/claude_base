@@ -13,6 +13,14 @@ section "Versioning", for what MAJOR / MINOR / PATCH mean here.
   deferred or temporarily hidden functionality (a parked feature, a
   commented-out screen/route, a control hidden until the backend is ready),
   kept separate from `// TODO` so deferred work is greppable on its own.
+- `layers`: a **Pull-to-Refresh** rule under the Presentation layer — every
+  screen that shows server-loaded data in a scroll view should reload all of
+  its data through a shared `PullToRefreshPro` widget and a single VM
+  `refresh()`, by default; lists the screens to skip (maps, static/stub
+  screens, forms).
+- `global`: an **Editing These Instructions** rule — changes to the instruction
+  files must be made in this package, not in a project's vendored `.claude/base`
+  copy, so they can be versioned, tagged, and rolled out via `/plugin update`.
 
 ## [0.0.1]
 

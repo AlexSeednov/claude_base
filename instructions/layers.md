@@ -116,6 +116,14 @@ void dispose() {
 - No business/presentation logic in widgets — logic belongs in the VM.
 - No heavy operations in `build()`.
 
+### Pull-to-Refresh
+
+On **every** screen that shows server-loaded data in a scroll view, add pull-to-refresh that reloads **all** of that screen's data. Do it by default wherever it makes sense — don't wait to be asked.
+
+- Wrap the screen's scrollable in the shared `PullToRefreshPro` widget (`view/widget/loading/`, built on `custom_refresh_indicator`; port it from the reference project if the current one lacks it). Give the scrollable `AlwaysScrollableScrollPhysics` so the gesture fires even when the content is shorter than the screen; use `edgeOffset` to slide the indicator out from **under** a fixed/translucent top bar instead of behind it.
+- The gesture calls a single `refresh()` on the VM that re-fetches **every** piece of data the screen renders — load the independent parts in parallel via `Future.wait`, and return the `Future` so the indicator keeps spinning until all of it settles.
+- **Skip** screens where the gesture doesn't fit or there is nothing to reload: maps (the drag fights panning), static/stub screens, and forms / auth-flow screens.
+
 ---
 
 ## Theme Layer (`lib/theme/`)
