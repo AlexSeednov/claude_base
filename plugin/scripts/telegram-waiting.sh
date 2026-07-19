@@ -6,6 +6,11 @@
 
 set -u
 
+# Fallback definition: if the helper is missing the hook must still notify.
+resolve_project_name() { printf '%s' 'Unknown project'; }
+# shellcheck source=./project-name.sh
+. "$(dirname "$0")/project-name.sh" 2>/dev/null || true
+
 input_json="$(cat)"
 
 token="${TELEGRAM_BOT_TOKEN:-}"
@@ -17,12 +22,13 @@ if [ -z "$token" ] || [ -z "$chat_id" ]; then
 fi
 
 tool_name="$(printf '%s' "$input_json" | jq -r '.tool_name // empty' 2>/dev/null)"
+project="$(resolve_project_name "$(printf '%s' "$input_json" | jq -r '.cwd // empty' 2>/dev/null)")"
 text=""
 
 case "$tool_name" in
   AskUserQuestion)
     # Claude is asking a clarifying question.
-    text="Claude - Question"
+    text="❓ Claude: $project — Question"
     ;;
   Bash)
     cmd="$(printf '%s' "$input_json" | jq -r '.tool_input.command // empty' 2>/dev/null)"
@@ -33,7 +39,7 @@ case "$tool_name" in
       if [ "${#short}" -gt 60 ]; then
         short="${short:0:60}..."
       fi
-      text="Claude - Approval: $short"
+      text="⚠️ Claude: $project — Approval: $short"
     fi
     ;;
 esac

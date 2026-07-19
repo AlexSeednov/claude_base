@@ -46,7 +46,9 @@ claude_base/
 │   │   ├── telegram-notify.sh    # Stop notification (Unix)
 │   │   ├── telegram-notify.ps1   # Stop notification (Windows)
 │   │   ├── telegram-waiting.sh   # PreToolUse notification (Unix)
-│   │   └── telegram-waiting.ps1  # PreToolUse notification (Windows)
+│   │   ├── telegram-waiting.ps1  # PreToolUse notification (Windows)
+│   │   ├── project-name.sh       # project-name resolver shared by both hooks (Unix)
+│   │   └── project-name.ps1      # project-name resolver shared by both hooks (Windows)
 │   └── skills/                   # auto-discovered when the plugin is installed
 │       ├── dart-add-unit-test/
 │       ├── dart-checks-assertions/
@@ -202,6 +204,39 @@ The plugin ships two hooks that send a Telegram message:
 `dispatch.js` is the entry point in both: it runs the `.sh` implementation on
 Unix and the `.ps1` on Windows, so one command string in `hooks.json` works on
 every platform.
+
+### Message format
+
+Every message opens with a status icon and the project name, so a phone showing
+several sessions at once stays readable:
+
+```
+✅ Claude: Stitchy — Convert the palette loader to a repository
+✅ Claude: Stitchy done          # session with no prompt to quote
+❓ Claude: Stitchy — Question
+⚠️ Claude: Stitchy — Approval: git push --force
+```
+
+### Project name
+
+`project-name.sh` / `.ps1` resolve the name, first match wins:
+
+1. the `CLAUDE_PROJECT_NAME` environment variable;
+2. `name:` from `pubspec.yaml` in the session's working directory;
+3. the name of that directory;
+4. `Unknown project`.
+
+Steps 2–3 need no setup at all. Set the variable when the package/folder name is
+not what you want to read on your phone (`cross_stitch` → `Stitchy`) — in the
+`env` block of the project's `.claude/settings.local.json`:
+
+```json
+{
+  "env": {
+    "CLAUDE_PROJECT_NAME": "Stitchy"
+  }
+}
+```
 
 ### Credentials
 

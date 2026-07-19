@@ -5,6 +5,23 @@ All notable changes to this repository are documented here. The format follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). See the README,
 section "Versioning", for what MAJOR / MINOR / PATCH mean here.
 
+## [0.0.3]
+
+### Added
+
+- Telegram hooks: the project name now appears in every message, resolved from
+  the `CLAUDE_PROJECT_NAME` environment variable, then `pubspec.yaml`, then the
+  working directory name, falling back to `Unknown project`. New shared
+  resolvers `plugin/scripts/project-name.sh` / `.ps1`.
+
+### Changed
+
+- Telegram hooks: messages now open with a status icon and the project name —
+  `✅ Claude: Stitchy — <prompt>` on finish, `❓ Claude: Stitchy — Question` on a
+  clarifying question, `⚠️ Claude: Stitchy — Approval: <command>` before a risky
+  shell command. A finished session with nothing to quote reads
+  `✅ Claude: Stitchy done` instead of `Claude session finished`.
+
 ## [0.0.2]
 
 ### Added

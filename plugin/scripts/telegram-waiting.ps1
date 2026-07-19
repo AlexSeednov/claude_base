@@ -2,6 +2,8 @@
 # Fires on PreToolUse for: AskUserQuestion, Bash (dangerous patterns only).
 # Required env vars: TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID.
 
+. (Join-Path $PSScriptRoot 'project-name.ps1')
+
 $input_json = [Console]::In.ReadToEnd()
 
 $token = $env:TELEGRAM_BOT_TOKEN
@@ -21,12 +23,13 @@ try {
 }
 
 $toolName = $data.tool_name
+$project = Resolve-ProjectName -PayloadCwd $data.cwd
 $text = $null
 
 switch ($toolName) {
     'AskUserQuestion' {
         # Claude is asking a clarifying question
-        $text = 'Claude - Question'
+        $text = "❓ Claude: $project — Question"
     }
     'Bash' {
         # Only notify for commands matching dangerous patterns
@@ -55,7 +58,7 @@ switch ($toolName) {
                 if ($short.Length -gt 60) {
                     $short = $short.Substring(0, 60) + '...'
                 }
-                $text = "Claude - Approval: $short"
+                $text = "⚠️ Claude: $project — Approval: $short"
                 break
             }
         }

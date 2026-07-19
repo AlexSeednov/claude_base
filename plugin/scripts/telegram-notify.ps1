@@ -1,6 +1,8 @@
 # Sends a Telegram notification when Claude finishes a session.
 # Required env vars: TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID.
 
+. (Join-Path $PSScriptRoot 'project-name.ps1')
+
 $input_json = [Console]::In.ReadToEnd()
 
 $token = $env:TELEGRAM_BOT_TOKEN
@@ -45,10 +47,12 @@ try {
     }
 } catch {}
 
+$project = Resolve-ProjectName -PayloadCwd $(if ($data) { $data.cwd } else { $null })
+
 if ($sessionName) {
-    $text = "Claude: $sessionName"
+    $text = "✅ Claude: $project — $sessionName"
 } else {
-    $text = 'Claude session finished'
+    $text = "✅ Claude: $project done"
 }
 
 $body = @{
