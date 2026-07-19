@@ -5,6 +5,11 @@
 
 set -u
 
+# Fallback definition: if the helper is missing the hook must still notify.
+resolve_project_name() { printf '%s' 'Unknown project'; }
+# shellcheck source=./project-name.sh
+. "$(dirname "$0")/project-name.sh" 2>/dev/null || true
+
 input_json="$(cat)"
 
 token="${TELEGRAM_BOT_TOKEN:-}"
@@ -38,6 +43,8 @@ if [ -n "$transcript_path" ] && [ -f "$transcript_path" ]; then
   ' "$transcript_path" 2>/dev/null)"
 fi
 
+project="$(resolve_project_name "$(printf '%s' "$input_json" | jq -r '.cwd // empty' 2>/dev/null)")"
+
 if [ -n "$session_name" ]; then
   # Keep only the first line and cap the length, mirroring the Windows script.
   first_line="$(printf '%s' "$session_name" | head -n1)"
@@ -46,9 +53,9 @@ if [ -n "$session_name" ]; then
   if [ "${#first_line}" -gt 100 ]; then
     first_line="${first_line:0:100}..."
   fi
-  text="Claude: $first_line"
+  text="✅ Claude: $project — $first_line"
 else
-  text="Claude session finished"
+  text="✅ Claude: $project done"
 fi
 
 # Build the body via jq so Cyrillic and special characters stay valid JSON.
