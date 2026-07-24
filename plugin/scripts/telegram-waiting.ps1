@@ -1,8 +1,20 @@
 # Sends a Telegram notification when Claude needs user input or is about to run a dangerous command.
 # Fires on PreToolUse for: AskUserQuestion, Bash (dangerous patterns only).
 # Required env vars: TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID.
+#
+# Keep this file pure ASCII. Windows PowerShell 5.1 reads a BOM-less script in the
+# system ANSI codepage, so a literal glyph is decoded byte by byte: an em dash
+# turns into a typographic quote, which PowerShell honours as a string delimiter
+# and the whole script dies with a parser error before sending anything. Message
+# glyphs are therefore built from code points below.
 
 . (Join-Path $PSScriptRoot 'project-name.ps1')
+
+# U+2753 BLACK QUESTION MARK ORNAMENT, U+26A0 WARNING SIGN followed by U+FE0F
+# VARIATION SELECTOR-16 (renders the sign in colour), U+2014 EM DASH.
+$glyphQuestion = [char]0x2753
+$glyphWarning = [string][char]0x26A0 + [string][char]0xFE0F
+$glyphDash = [char]0x2014
 
 $input_json = [Console]::In.ReadToEnd()
 
@@ -29,7 +41,7 @@ $text = $null
 switch ($toolName) {
     'AskUserQuestion' {
         # Claude is asking a clarifying question
-        $text = "❓ Claude: $project — Question"
+        $text = "$glyphQuestion Claude: $project $glyphDash Question"
     }
     'Bash' {
         # Only notify for commands matching dangerous patterns
@@ -58,7 +70,7 @@ switch ($toolName) {
                 if ($short.Length -gt 60) {
                     $short = $short.Substring(0, 60) + '...'
                 }
-                $text = "⚠️ Claude: $project — Approval: $short"
+                $text = "$glyphWarning Claude: $project $glyphDash Approval: $short"
                 break
             }
         }
@@ -66,7 +78,7 @@ switch ($toolName) {
 }
 
 if (-not $text) {
-    # Not our case — silently pass through
+    # Not our case - silently pass through
     Write-Output '{"continue":true}'
     exit 0
 }
