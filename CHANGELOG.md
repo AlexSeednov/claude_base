@@ -5,6 +5,23 @@ All notable changes to this repository are documented here. The format follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). See the README,
 section "Versioning", for what MAJOR / MINOR / PATCH mean here.
 
+## [0.0.4]
+
+### Fixed
+
+- Telegram hooks on Windows: no notification was ever delivered. Windows
+  PowerShell 5.1 reads a BOM-less `.ps1` in the system ANSI codepage, where the
+  UTF-8 bytes of the em dash introduced in 0.0.3 decode to a typographic quote —
+  PowerShell honours it as a string delimiter, so `telegram-notify.ps1` and
+  `telegram-waiting.ps1` died with a parser error before sending anything. Both
+  scripts are now pure ASCII and build their message glyphs from code points, so
+  no future save can reintroduce the fault. macOS and Linux were never affected;
+  they run the `.sh` variants. Message text is unchanged.
+- `dispatch.js` no longer discards the hook script's stderr. A non-zero exit is
+  now reported together with the captured output, and always as exit code 1 —
+  never the blocking 2 — so a broken hook is visible instead of quietly doing
+  nothing, and still cannot stall a session.
+
 ## [0.0.3]
 
 ### Added

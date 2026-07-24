@@ -217,6 +217,14 @@ several sessions at once stays readable:
 ⚠️ Claude: Stitchy — Approval: git push --force
 ```
 
+Editing this format carries one constraint: the `.ps1` scripts must stay **pure
+ASCII** and build their glyphs from code points (`[char]0x2705`), as they do
+now. Windows PowerShell 5.1 reads a BOM-less script in the system ANSI codepage,
+where a pasted literal glyph can decode into a character that terminates the
+surrounding string and kills the hook with a parser error — this is exactly what
+broke every Windows notification in 0.0.3. The `.sh` variants take literals
+as-is.
+
 ### Project name
 
 `project-name.sh` / `.ps1` resolve the name, first match wins:

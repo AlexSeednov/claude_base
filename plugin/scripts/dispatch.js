@@ -37,12 +37,35 @@ const args = isWindows
 let child;
 try {
   // stdin/stdout inherited: the child reads the hook payload and writes the
-  // verdict directly. stderr is dropped so a missing tool stays silent.
-  child = spawn(command, args, { stdio: ['inherit', 'inherit', 'ignore'] });
+  // verdict directly. stderr is captured rather than dropped, so a healthy run
+  // stays quiet while a genuine failure can still be reported on exit.
+  child = spawn(command, args, { stdio: ['inherit', 'inherit', 'pipe'] });
 } catch (_) {
   passThrough();
 }
 
+// Bounded: a script failing in a loop must not grow this without limit.
+const stderrChunks = [];
+child.stderr.on('data', (chunk) => {
+  if (stderrChunks.length < 32) stderrChunks.push(chunk);
+});
+
 // Spawn failure (e.g. interpreter not found) — pass through instead of erroring.
 child.on('error', passThrough);
-child.on('exit', (code) => process.exit(code == null ? 0 : code));
+
+// 'close' rather than 'exit': it fires once the captured stderr has drained, so a
+// fast failure can never be reported with half of its message missing.
+child.on('close', (code) => {
+  if (!code) return;
+  // A non-zero exit means the hook script itself broke — a syntax error, a
+  // missing dependency. Say so: swallowing this output once hid a parser error
+  // that silently disabled the Windows notifications altogether.
+  const detail = Buffer.concat(stderrChunks).toString('utf8').trim();
+  const name = path.basename(scriptPath);
+  // Set the code and let Node drain and exit by itself rather than calling
+  // process.exit(): a write to a pipe is asynchronous on macOS, so exiting
+  // outright would truncate the very report this exists to deliver. 1 and never
+  // 2 — 2 is what Claude Code reads as a blocking hook failure.
+  process.exitCode = 1;
+  process.stderr.write(`${name} failed${detail ? `:\n${detail}` : ` with exit code ${code}`}\n`);
+});

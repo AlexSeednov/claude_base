@@ -1,7 +1,17 @@
 # Sends a Telegram notification when Claude finishes a session.
 # Required env vars: TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID.
+#
+# Keep this file pure ASCII. Windows PowerShell 5.1 reads a BOM-less script in the
+# system ANSI codepage, so a literal glyph is decoded byte by byte: an em dash
+# turns into a typographic quote, which PowerShell honours as a string delimiter
+# and the whole script dies with a parser error before sending anything. Message
+# glyphs are therefore built from code points below.
 
 . (Join-Path $PSScriptRoot 'project-name.ps1')
+
+# U+2705 WHITE HEAVY CHECK MARK, U+2014 EM DASH.
+$glyphDone = [char]0x2705
+$glyphDash = [char]0x2014
 
 $input_json = [Console]::In.ReadToEnd()
 
@@ -50,9 +60,9 @@ try {
 $project = Resolve-ProjectName -PayloadCwd $(if ($data) { $data.cwd } else { $null })
 
 if ($sessionName) {
-    $text = "✅ Claude: $project — $sessionName"
+    $text = "$glyphDone Claude: $project $glyphDash $sessionName"
 } else {
-    $text = "✅ Claude: $project done"
+    $text = "$glyphDone Claude: $project done"
 }
 
 $body = @{
