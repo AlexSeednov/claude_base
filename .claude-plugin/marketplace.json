@@ -10,7 +10,7 @@
     {
       "name": "flutter-base",
       "source": "./plugin",
-      "description": "Test skills (unit, widget, integration, test doubles, coverage) and cross-platform Telegram notification hooks for the Flutter/Dart stack.",
+      "description": "Test skills (unit, widget, integration, test doubles, coverage), a refactor-audit skill, and cross-platform Telegram notification hooks for the Flutter/Dart stack.",
       "category": "development",
       "keywords": ["flutter", "dart", "testing"]
     }
