@@ -7,7 +7,7 @@ here instead of being copy-pasted into every repository.
 The repository plays two roles at the same time:
 
 - a **plugin marketplace** (`claude-base`) that distributes the **`flutter-base`
-  plugin** — test skills and Telegram notification hooks;
+  plugin** — test and refactor-audit skills, plus Telegram notification hooks;
 - a store of **always-on instruction files** (`instructions/`) that a project's
   `CLAUDE.md` pulls in with `@import`.
 
