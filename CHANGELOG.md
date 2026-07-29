@@ -5,6 +5,23 @@ All notable changes to this repository are documented here. The format follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). See the README,
 section "Versioning", for what MAJOR / MINOR / PATCH mean here.
 
+## [0.0.4]
+
+### Added
+
+- New skill `flutter-refactor-audit`: a standing audit of already-committed code
+  — layer and architecture violations, duplicated logic and widgets that should
+  be unified, dead code, design-token / localization / convention breaches, and
+  non-optimal or wasteful widget, VM and domain code. Scopes the pass to one
+  slice of the tree, runs a deterministic grep sweep before the judgment pass,
+  treats a deviation whose reason is written down as documented rather than
+  broken, then re-verifies every finding against the source — trying to refute
+  it — before reporting. The answer is two prioritized lists with verified
+  `file:line` references: **must do** (a hard rule broken or a defect waiting to
+  happen) and **worth doing** (structure, reuse or cost). Read-only unless fixes
+  are requested. Complements `/simplify` and `/code-review`, which look at the
+  working diff rather than the tree.
+
 ## [0.0.3]
 
 ### Added

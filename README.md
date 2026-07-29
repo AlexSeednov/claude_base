@@ -55,6 +55,7 @@ claude_base/
 │       ├── dart-collect-coverage/
 │       ├── flutter-add-widget-test/
 │       ├── flutter-add-integration-test/
+│       ├── flutter-refactor-audit/
 │       └── flutter-test-doubles/
 ├── instructions/                 # always-on context, consumed via @import (NOT part of the plugin)
 │   ├── global.md
@@ -284,6 +285,7 @@ All skills auto-load once the plugin is installed and appear as
 | `dart-collect-coverage`        | Collect LCOV coverage, excluding generated code.                                    |
 | `flutter-add-widget-test`      | Component/widget tests with `WidgetTester` and `ValueListenableBuilder`-driven UI.  |
 | `flutter-add-integration-test` | End-to-end flows with `integration_test` across flavors.                            |
+| `flutter-refactor-audit`       | Audit committed code: layer violations, duplication, dead code, convention breaches. Re-verifies findings, answers with a must-do and a worth-doing list. |
 | `flutter-test-doubles`         | Test doubles and getIt/injectable wiring; prefer fakes over mocks.                  |
 
 ## Singletons and dependency injection

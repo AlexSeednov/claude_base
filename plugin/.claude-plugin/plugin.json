@@ -2,13 +2,13 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "flutter-base",
   "displayName": "Flutter Base",
-  "version": "0.0.3",
-  "description": "Shared Claude Code toolkit for Flutter/Dart clean-architecture projects: test skills (unit, widget, integration, test doubles, coverage) plus cross-platform Telegram session-notification hooks.",
+  "version": "0.0.4",
+  "description": "Shared Claude Code toolkit for Flutter/Dart clean-architecture projects: test skills (unit, widget, integration, test doubles, coverage), a refactor-audit skill, plus cross-platform Telegram session-notification hooks.",
   "author": {
     "name": "Alex Seednov"
   },
   "homepage": "https://github.com/AlexSeednov/claude_base",
   "repository": "https://github.com/AlexSeednov/claude_base",
   "license": "MIT",
-  "keywords": ["flutter", "dart", "testing", "clean-architecture", "get-it", "hooks"]
+  "keywords": ["flutter", "dart", "testing", "refactoring", "clean-architecture", "get-it", "hooks"]
 }
