@@ -5,6 +5,35 @@ All notable changes to this repository are documented here. The format follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). See the README,
 section "Versioning", for what MAJOR / MINOR / PATCH mean here.
 
+## [0.1.0]
+
+### Added
+
+- Layers, Presentation: new section *Adaptive Layouts (mobile + desktop)*,
+  explicitly scoped to projects that ship both designs — in a single-design
+  project the plain `widget/` folder and no platform suffixes stay correct. A
+  screen with two layouts splits its widgets into `widget/` (both layouts),
+  `widget_mobile/` and `widget_desktop/`; the platform suffix goes **last**
+  (`auth_body_desktop.dart` / `AuthBodyDesktop`, never `AuthDesktopBody`) so a
+  sorted folder groups a widget with its own variants. The screen file keeps no
+  layout of its own — VM lifecycle plus `LayoutSwitcher`, with both bodies as
+  widgets rather than `_mobileScaffold()` methods on the `State`, since the
+  asymmetry of "desktop extracted, mobile inline" is how the split rots. A
+  widget reaches `widget/` only when both layouts actually use it, and a body
+  serving both classes (a screen the desktop design does not cover yet) stays
+  suffix-free because it is common, not mobile. Closes with the deduplication
+  rule: share the leaves, and do not merge two layouts behind a pile of flags
+  when the difference *is* the layout.
+- Layers, Widget Rules: one widget per file, the file named after it. A private
+  sub-widget that grew a layout of its own moves out and becomes public; only
+  non-widget internals (`State`, `RenderObject`, `LayoutDelegate`, a storage
+  `InheritedWidget`) stay beside their owner.
+
+### Changed
+
+- Dart conventions, Naming: the file/class rules now name the platform suffix
+  and the one-widget-per-file naming link, pointing at the new Layers section.
+
 ## [0.0.5]
 
 ### Added
