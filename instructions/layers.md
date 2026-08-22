@@ -112,9 +112,34 @@ void dispose() {
 - Use `const` constructors. Keep widgets small — extract subtrees into separate widgets.
 - Use the `spacing` parameter **only when all gaps between children are equal**. When gaps differ, keep a flat `Row`/`Column` with `SizedBox` separators — do not nest widgets just to use `spacing`.
 - A widget used by **only one screen** lives in that screen's `widget/` subfolder (`view/screen/<feature>/<screen>/widget/`). Put a widget in `view/widget/` **only** when it is reused across screens.
+- **One widget per file**, and the file is named after it: `product_card_small.dart` → `ProductCardSmall`. A private sub-widget that grew a layout of its own moves into its own file and becomes public. Only non-widget internals stay beside their owner: its `State`, a `RenderObject`, a `LayoutDelegate`, or the `InheritedWidget` that merely stores its data.
 - Scope `ValueListenableBuilder<T>` as **narrowly as possible** to minimize rebuilds.
 - No business/presentation logic in widgets — logic belongs in the VM.
 - No heavy operations in `build()`.
+
+### Adaptive Layouts (mobile + desktop)
+
+> **Applies only to projects that ship both a mobile and a desktop design.**
+> With a single design there is a single layout: keep the plain `widget/` folder
+> and no platform suffixes anywhere.
+
+A screen with two layouts splits its widgets into three folders beside it:
+
+```
+view/screen/<feature>/<screen>/
+├── <screen>.dart      # VM lifecycle + LayoutSwitcher, no layout of its own
+├── widget/            # used by BOTH layouts       — no suffix
+├── widget_mobile/     # mobile layout only         — `_mobile` suffix
+└── widget_desktop/    # desktop layout only        — `_desktop` suffix
+```
+
+- **The suffix is always last**: `auth_body_desktop.dart` / `AuthBodyDesktop`, `catalog_feed_mobile.dart` / `CatalogFeedMobile` — never in the middle (`AuthDesktopBody`). Sorted by name, a widget then sits next to its own variants instead of being scattered by prefix.
+- The screen file carries **no layout**: it owns the VM lifecycle and returns `LayoutSwitcher(mobile: …, desktop: …)`. Both bodies are widgets in their platform folder — not `_mobileScaffold()` methods on the `State`. Asymmetry (desktop extracted, mobile inline) is the usual way this rots.
+- A widget belongs in `widget/` **only when both layouts really use it**. Used by one layout — it lives in that layout's folder, whatever its name suggests.
+- The same split applies to widgets shared across a feature (`view/screen/<feature>/widget/` + `widget_desktop/` + `widget_mobile/`) and to reusable ones under `view/widget/`.
+- A screen the desktop design does not cover yet has **one** body serving both classes: it stays in `widget/` **without** a suffix — it is common, not mobile.
+
+Before splitting a widget in two, check what actually differs. Share the leaves — a list item, a rate row, an action button, a form — and keep them in `widget/`. Do **not** merge two layouts behind a pile of flags: when the difference *is* the layout (column vs grid, expand-in-place vs open-a-screen, other typography and spacing), two widgets over shared leaves is the correct answer. Write the reason in the doc comment of each so the next reader doesn't re-litigate it.
 
 ### Pull-to-Refresh
 

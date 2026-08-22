@@ -2,8 +2,8 @@
 
 ## Naming
 
-- **Files**: `snake_case.dart`. Role suffix: `_vm`, `_model`, `_entity`, `_service`, `_pro`.
-- **Classes**: `PascalCase`. Prefer `final class`. Contracts — `abstract interface class`, base classes — `abstract base class`.
+- **Files**: `snake_case.dart`. Role suffix: `_vm`, `_model`, `_entity`, `_service`, `_pro`. In a project with both a mobile and a desktop design, a platform-specific widget also carries `_mobile` / `_desktop` — always **last**, after the role suffix (see Layers → *Adaptive Layouts*).
+- **Classes**: `PascalCase`. Prefer `final class`. Contracts — `abstract interface class`, base classes — `abstract base class`. A widget class is named after its file (`product_card_small.dart` → `ProductCardSmall`), and each file holds one widget.
 - **Identifiers**: `lowerCamelCase`. Acronyms longer than 2 letters — treat as words: `HttpClient`, not `HTTPClient`.
 - **Generated files**: `.g.dart`, `.gr.dart`, `.gen.dart`, `.config.dart` — declared via `part`, **never edit manually**.
 - **No abbreviations**: `userRepository`, not `userRepo`; `backgroundColor`, not `bgColor`.
