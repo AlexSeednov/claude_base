@@ -5,6 +5,28 @@ All notable changes to this repository are documented here. The format follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). See the README,
 section "Versioning", for what MAJOR / MINOR / PATCH mean here.
 
+## [0.1.1]
+
+### Fixed
+
+- Global, *Editing These Instructions*: the claim that a consuming project picks
+  up instruction changes through `/plugin update` was wrong and sent everyone
+  down a dead end. The plugin ships only skills and hooks; `instructions/` is
+  imported by `CLAUDE.md` and never travels with it. The section now names the
+  real path per import option and ends with the part that is easy to miss —
+  `CLAUDE.md` imports are read once at session start, so the session must be
+  restarted after an update.
+
+### Changed
+
+- Updating (README) and the new *Pulling an Update into a Project* subsection
+  (Global): the subtree command is now a single copy-paste line that never opens
+  an editor — `GIT_MERGE_AUTOEDIT=no` plus `-m`, because `git subtree` shells out
+  to a plain `git merge --no-ff` and would otherwise stop in `$EDITOR` on a merge
+  message that is already written. The `vim` escape hatch is spelled out for when
+  it happens anyway, and the README now states up front that skills/hooks and
+  instructions update by two separate steps.
+
 ## [0.1.0]
 
 ### Added

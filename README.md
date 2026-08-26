@@ -395,20 +395,35 @@ a solo/small-team base does not need.
 
 ## Updating
 
-Per machine, after a new release is pushed:
+Two independent things move, and **each needs its own step** — the plugin update
+never carries instructions, because `instructions/` is imported by `CLAUDE.md`
+and lives outside the plugin.
+
+**Skills and hooks** — once per machine, after a new release is pushed:
 
 ```text
 /plugin marketplace update claude-base
 /plugin update flutter-base@claude-base
 ```
 
-Instructions:
+**Instructions** — depends on which option the project uses:
 
 - **Option A (local clone):** `git pull` in `~/Projects/Packages/claude_base` —
   every project that imports from it follows immediately.
-- **Option B (subtree):** in each project,
-  `git subtree pull --prefix .claude/base https://github.com/AlexSeednov/claude_base.git main --squash`,
-  then commit.
+- **Option B (subtree):** one command per project, from its root:
+
+```bash
+GIT_MERGE_AUTOEDIT=no git subtree pull --prefix .claude/base \
+  https://github.com/AlexSeednov/claude_base.git main --squash -m "Claude Base update"
+```
+
+  It commits by itself — nothing to do afterwards. `GIT_MERGE_AUTOEDIT=no` and
+  `-m` are what keep it to a single command: `git subtree` shells out to a plain
+  `git merge --no-ff`, which without them opens `$EDITOR` on a merge message that
+  is already filled in. (If you land in `vim` anyway: `Esc`, then `:wq`, Enter.)
+
+Either way, **restart the Claude session** afterwards — `CLAUDE.md` imports are
+read once at session start, so a running session keeps the old text.
 
 ## Adding to the base
 

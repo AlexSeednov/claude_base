@@ -9,8 +9,33 @@
 
 ## Editing These Instructions
 
-- These instruction files (`global`, `architecture`, `dart-conventions`, `packages`, `layers`) live in the shared **`claude_base`** package, not in the projects that consume them. **Make every change to them in the package repo** — never in a project's vendored copy under `.claude/base/…`, which is a read-only mirror pulled in via `/plugin update`.
-- Editing the vendored copy inside a project is lost on the next update and never reaches a tag. Change the package, add a `CHANGELOG.md` entry, bump the version in `plugin/.claude-plugin/plugin.json`, and let the user push and tag; consuming projects then pick it up through `/plugin update`.
+- These instruction files (`global`, `architecture`, `dart-conventions`, `packages`, `layers`) live in the shared **`claude_base`** package, not in the projects that consume them. **Make every change to them in the package repo** — never in a project's vendored copy under `.claude/base/…`, which is a read-only mirror.
+- Editing the vendored copy inside a project is lost on the next update and never reaches a tag. Change the package, add a `CHANGELOG.md` entry, bump the version in `plugin/.claude-plugin/plugin.json`, and let the user push and tag.
+
+### Pulling an Update into a Project
+
+`/plugin update` does **not** bring instructions — the plugin ships only skills
+and hooks; `instructions/` is imported by `CLAUDE.md`, outside the plugin. How a
+project refreshes them depends on how it imports them:
+
+- **Imported from a local clone** (`@~/Projects/Packages/claude_base/…` in `CLAUDE.md`): `git pull` in that clone. Every project follows at once.
+- **Vendored as a git subtree** (`@.claude/base/…` in `CLAUDE.md`) — one command, from the project root:
+
+```bash
+GIT_MERGE_AUTOEDIT=no git subtree pull --prefix .claude/base \
+  https://github.com/AlexSeednov/claude_base.git main --squash -m "Claude Base update"
+```
+
+`GIT_MERGE_AUTOEDIT=no` plus `-m` is what keeps it to one command: `git subtree`
+runs a plain `git merge --no-ff` underneath and would otherwise drop you into
+`$EDITOR` for a merge message that is already written. (Stuck there anyway — in
+`vim`: `Esc`, `:wq`, Enter.)
+
+Either way the running session keeps the **old** text: `CLAUDE.md` imports are
+read once at session start. **Restart the session** after updating.
+
+Git writes are the user's call (see *Git: Read-Only*) — hand over the command,
+don't run it.
 
 ## Changelog
 
