@@ -19,6 +19,15 @@ section "Versioning", for what MAJOR / MINOR / PATCH mean here.
 
 ### Changed
 
+- Packages, `cached_network_image`: the entry no longer spells out one project's
+  constructor — the parameter list, the named constructors and the shape of the
+  default placeholder differ per project, and a consumer whose widget did not
+  match was being told something false about its own code. What stays shared is
+  what actually holds everywhere: never `Image.network`, always the one
+  `CachedNetworkImagePro`; a nullable `url` falling back to a placeholder on
+  null / empty / load error; `cacheKey` identifying the cached entry; and auth
+  headers — where a project sends them at all — composed in that single place.
+  The rest is explicitly deferred to the project's own `project.md`.
 - Updating (README) and the new *Pulling an Update into a Project* subsection
   (Global): the subtree command is now a single copy-paste line that never opens
   an editor — `GIT_MERGE_AUTOEDIT=no` plus `-m`, because `git subtree` shells out
