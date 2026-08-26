@@ -25,11 +25,14 @@ Used in the project (if connected):
 - **cached_network_image** — caching of network images. **Never use `Image.network`
   directly** — load every network image through the single `CachedNetworkImagePro`
   widget (`lib/presentation/view/widget/base/cached_network_image_pro.dart`).
-  - The widget takes a nullable `url` (shows a placeholder on `null`/empty string and on
-    load error), plus optional `defaultImage` (a custom placeholder instead of the default
-    grey token backdrop), `cacheKey`, `fit`, `width`, `height`, `alignment`.
-  - Whether to send auth headers is a per-project decision (see `project.md`). If needed,
-    add headers here, in this one place.
+  - It takes a nullable `url` and falls back to a placeholder on `null`, on an empty
+    string and on a load error; `cacheKey` identifies the cached entry.
+  - Auth headers, where a project sends them at all, are composed **here and nowhere
+    else** — that single place is the point of the widget.
+  - Everything past that is per-project: the rest of the constructor surface, any named
+    constructors, what the default placeholder is, and whether auth headers are used.
+    Read it off the widget, and keep what's worth writing down in `project.md` — not
+    here, where it would only describe one project.
 
 ## pubspec.yaml Rules
 
