@@ -29,8 +29,8 @@ tests). `@lazySingleton` — lazy, `@singleton` — eager; registration is codeg
 `service_locator.config.dart`. Do **not** use the legacy `_instance` + `factory
 .singleton()`: dual control over the lifecycle (static + getIt) leaks state between tests.
 
-> Services from `application_base` and `firebase_base` are injectable (external injectable
-> modules wired into `@InjectableInit`) — take them via the constructor or via `getIt<T>()`.
+> Services from `application_base`, `firebase_base` and `metrica_base` are injectable (external
+> injectable modules wired into `@InjectableInit`) — take them via the constructor or via `getIt<T>()`.
 > If a dependency is registered **outside** codegen (manual registration), injectable cannot
 > inject it through the constructor — take it via `getIt<T>()` in the method body.
 
@@ -51,6 +51,7 @@ tests). `@lazySingleton` — lazy, `@singleton` — eager; registration is codeg
 - Obtain dependencies via `getIt<T>()`, not through widget constructors.
 - All registration — via `injectable` annotations + codegen. No manual registration.
 - Interface → implementation binding: `@LazySingleton(as: RepositoryInterface)` on the concrete class.
+- After touching DI, check the graph with `fvm dart run application_base:getit_check`: **HIGH** cycles must stay at zero. A cycle is broken by turning one of its edges into a lazy `getIt<T>()` getter with a comment naming the cycle it closes — not by manual registration.
 
 ## Navigation
 

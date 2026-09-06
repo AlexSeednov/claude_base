@@ -5,6 +5,62 @@ All notable changes to this repository are documented here. The format follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). See the README,
 section "Versioning", for what MAJOR / MINOR / PATCH mean here.
 
+## [0.1.2]
+
+Most of this release is a sweep of the consuming projects' `project.md` files:
+rules that hold for the whole stack had been written there — in three copies at
+worst — instead of here. They now live in the base; the projects keep only
+their own specifics.
+
+### Added
+
+- Global: a **Logging** section. Anything that could later explain a
+  malfunction — state transitions, navigation, gesture outcomes, storage
+  failures, lifecycle commits — must leave a log line through the shared
+  `application_base` logger, with an explicit ceiling (no logs in `build()`,
+  per-frame callbacks, `onUpdate` streams, or loops). Born from a real hunt: a
+  sheet state machine misbehaved on device and the log had nothing to say
+  about it.
+- Global: **Report Mismatches Immediately** — when the design, the API, the
+  reference data and the code disagree, the finding is reported and waits for
+  a decision; a workaround that hides it is not allowed. Two projects carried
+  their own wording of this rule.
+- Global: a **Figma** section — the two MCP servers (the read-only community
+  server and the official plugin server, which alone can write), the `/mcp`
+  re-authorisation dance with the tools appearing on the next turn, and the
+  rule that a mockup task is done only once the change is in Figma. Was in one
+  project's `project.md`; file keys and which servers a project configures
+  stay there.
+- Packages: **`metrica_base`** joins the internal packages — what the package
+  owns (contracts, AppMetrica on mobile, the Metrica counter on the web, the
+  router observer, error grouping) and what stays in a project: the keys per
+  flavor handed over as `MetricaConfig`, the `sealed` events registry on top of
+  `AnalyticsEventBase`, the DI environments, the web consent gate.
+- Packages: internal packages change **in their own repositories** and reach a
+  project by tag; a temporary `dependency_overrides` path entry until the tag
+  exists carries a `TODO` naming that tag.
+- Packages, `hive_ce`: the data-safety rules — generated `AdapterSpec` entries
+  at the end only, `hive_adapters.g.yaml` checked in, box names / keys / stored
+  fields frozen, a record that fails to load is skipped, never wiped.
+- Layers, *Assets*: **Raster densities** — the `1x/2x/3x` set, why no other
+  buckets, and the Figma export at `pngScale` 1/2/3 without `imageRef`. Three
+  projects carried this section verbatim.
+- Layers, *Theme*: **Design tokens** — values only from tokens, no hand edits
+  of the generated files, a missing token is a literal with a mandatory `TODO`.
+  Two projects carried it; the pipeline itself stays per project.
+- Dart conventions, *Dependency Injection*: after touching DI run
+  `application_base:getit_check` — HIGH cycles stay at zero, and a cycle is
+  broken by a lazy `getIt<T>()` getter with a comment, not by manual
+  registration.
+
+### Changed
+
+- Architecture, *Build and Codegen*: `build_runner` 2.15 deletes conflicting
+  outputs by itself, so the flag is gone from the command — and from the
+  `flutter-test-doubles` skill.
+- Dart conventions and README: `metrica_base` services are injectable the same
+  way as those of `application_base` and `firebase_base`.
+
 ## [0.1.1]
 
 ### Fixed

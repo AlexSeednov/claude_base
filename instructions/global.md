@@ -7,6 +7,11 @@
 - Add `///` doc comments before **every** declaration — class, field, constructor, method (including `@override` ones like `build`), enum, and parameter — even if no explanation is needed (leave the comment empty `///` or with a single word). In the body of the comment, describe only the **WHY** when the reason is non-obvious (a constraint, a workaround, a hidden invariant). What the code does is explained by its names.
 - **Do not reference design tools in comments**: no Figma component/style/variant names, node IDs, links, or exported CSS-style property strings (e.g. `padding: 16px`, `backdropFilter: blur(25px)`). Describe intent in domain terms. A neutral phrase like "from the mockup" is allowed, but **don't add it where the design origin is self-evident** (e.g. layout dimension/spacing constants) — there it's redundant noise. Use it only when it conveys something non-obvious. Never name a Figma component.
 
+## Report Mismatches Immediately
+
+- If the design, the API or its spec, the reference data and the code disagree — a field missing from a payload or a data file, a mockup contradicting the data model, a formula that cannot be satisfied, an endpoint that does not answer — **report it to the user immediately** and wait for a decision.
+- **Do not build workarounds** or "tune" the behaviour to hide the problem: such findings are valuable in themselves, and a workaround masks them. Better to stop and ask than to paper over a mismatch.
+
 ## Editing These Instructions
 
 - These instruction files (`global`, `architecture`, `dart-conventions`, `packages`, `layers`) live in the shared **`claude_base`** package, not in the projects that consume them. **Make every change to them in the package repo** — never in a project's vendored copy under `.claude/base/…`, which is a read-only mirror.
@@ -36,6 +41,12 @@ read once at session start. **Restart the session** after updating.
 
 Git writes are the user's call (see *Git: Read-Only*) — hand over the command,
 don't run it.
+
+## Logging
+
+- **Every action that could later explain a malfunction must leave a log line**: state-machine and screen-state transitions, navigation (entering/leaving a screen, forced pops), gesture outcomes that drive state, storage writes and their failures, lifecycle commits (flushing on background, banking a session). The bar: a bug report plus the log should be enough to reconstruct what happened, without a debugger.
+- **Without excess**: no logs in `build()`, per-frame callbacks, drag/scroll `onUpdate`, timers, or per-item loops. Log the **decision or outcome** (one line per event), not the stream that led to it.
+- Use the shared logger from `application_base` (`logInfo` / `logError`; `LoggingMixin` with a `logName` for named sources) — never `print` / `debugPrint`.
 
 ## Changelog
 
@@ -71,6 +82,19 @@ fvm dart <args>
 ```
 
 The pinned Flutter version is defined in `.fvmrc` at the project root. The corresponding Dart SDK version is listed under `environment.sdk` in `pubspec.yaml`.
+
+## Figma
+
+Design links, file keys and start nodes are project-specific and live in `project.md`. What is shared is how the two Figma MCP servers are used — they are not interchangeable:
+
+- **`figma`** (community package `figma-developer-mcp`, configured per project in `.mcp.json` — gitignored, it holds the personal REST token; needs Node.js / `npx`). **Read-only**: `get_figma_data` for a frame/page tree, `download_figma_images` for exports. The cheap way to find node ids and read a frame's structure.
+- **`plugin:figma:figma`** (the official Figma plugin server). The **only way to write**: `use_figma` (create / clone / edit nodes — load the `/figma-use` skill before every call), plus `get_metadata`, `get_screenshot`, `get_design_context`. It authenticates on its own, independently of the REST token.
+
+After a fresh session either server may have to be approved via `/mcp` before its tools appear. The official plugin server can show as connected while exposing **no tools** in the session's tool list — then ask the user to re-authorise it in `/mcp`; the tools appear on the **next user turn** (re-run `ToolSearch "select:mcp__plugin_figma_figma__use_figma"`), no restart needed.
+
+**Any task that changes the mockups is not done until the change is in Figma** through `use_figma`. If the write tools are missing, say so explicitly, ask for the re-authorisation, and finish the mockup edit as soon as they are back — never treat the read-only server as a substitute.
+
+Raster exports for the asset densities: see Layers → *Assets* → *Raster densities*.
 
 ## Code Review
 
