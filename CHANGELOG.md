@@ -5,6 +5,20 @@ All notable changes to this repository are documented here. The format follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). See the README,
 section "Versioning", for what MAJOR / MINOR / PATCH mean here.
 
+## [0.1.3]
+
+### Added
+
+- Global → *Figma*: a rule that everything a node can take from the file's own
+  variables and styles must be **bound** to one — and that a value missing from
+  the palette is added as a style or variable, not left hand-set. Unbound values
+  never reach the Design Tokens export, so the code below them ends up
+  hardcoding a literal or faking a `copyWith` with no sign the palette is short.
+  Two corollaries come with it: edit the **master** (instances without their own
+  override inherit it, which is how a master falls behind its screens), and
+  leave **scaled copies** alone — a frame exported at a non-1× scale carries
+  fractional sizes on purpose, and binding a style there breaks the export.
+
 ## [0.1.2]
 
 Most of this release is a sweep of the consuming projects' `project.md` files:

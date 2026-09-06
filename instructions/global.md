@@ -94,6 +94,24 @@ After a fresh session either server may have to be approved via `/mcp` before it
 
 **Any task that changes the mockups is not done until the change is in Figma** through `use_figma`. If the write tools are missing, say so explicitly, ask for the re-authorisation, and finish the mockup edit as soon as they are back — never treat the read-only server as a substitute.
 
+**Build on the file's own tokens, never on loose values.** Whatever a node can take
+from the file's variables and styles — colour, text style, radius, spacing — must be **bound**
+to one, when creating it and when editing it. Missing from the palette? **Create the style or
+variable and bind to that** — never leave a hand-set value behind, and never work around the gap
+with an approximation. A loose value is invisible twice over: the Design Tokens export ships only
+styles and variables, so unbound typography and colour never reach `tokens.json`, and the code
+that needs them hardcodes a literal or fakes a `copyWith` — with nothing to show the palette is
+short. Two consequences worth knowing:
+
+- **Fix the master, not the instances.** Instances without an override of their own inherit it,
+  so one edit on the component carries the whole file. Overriding instance by instance is how a
+  master silently falls behind the screens built from it.
+- **Scaled copies are the exception.** A frame exported at a non-1× scale (store screenshots, a
+  shrunken preview) carries fractional sizes on purpose; binding a style there resets them and
+  breaks the export. Leave them, and say why. The same goes for typography that is deliberately
+  not yours — a vendor's own badge or lockup: give it its own group rather than bending an app
+  style to fit.
+
 Raster exports for the asset densities: see Layers → *Assets* → *Raster densities*.
 
 ## Code Review
