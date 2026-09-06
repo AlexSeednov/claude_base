@@ -334,9 +334,9 @@ final class AccountModel {
   `service_locator.config.dart` — never register manually.
 - Do **not** use the legacy `_instance` + `factory .singleton()` pattern: dual
   control over the lifecycle (static + getIt) leaks state between tests.
-- Services from `application_base` and `firebase_base` are injectable (external
-  injectable modules wired into `@InjectableInit`) — take them via the
-  constructor or via `getIt<T>()`. A dependency registered **outside** codegen
+- Services from `application_base`, `firebase_base` and `metrica_base` are
+  injectable (external injectable modules wired into `@InjectableInit`) — take
+  them via the constructor or via `getIt<T>()`. A dependency registered **outside** codegen
   (manual registration) cannot be constructor-injected — take it via `getIt<T>()`
   in the method body.
 

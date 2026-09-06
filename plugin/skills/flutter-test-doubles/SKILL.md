@@ -52,5 +52,5 @@ Put reusable fakes under `lib/data/fake/` (so app + tests share them) or, if tes
 
 For a leaf collaborator with a wide surface where hand-writing a fake is wasteful, use `mockito`:
 add `dev:mockito` (`build_runner` is already a dev dep), annotate `@GenerateNiceMocks([MockSpec<T>()])`,
-run `fvm dart run build_runner build --delete-conflicting-outputs`, and stub async returns with
+run `fvm dart run build_runner build`, and stub async returns with
 `thenAnswer((_) async => ...)` (never `thenReturn` for `Future`/`Stream`).

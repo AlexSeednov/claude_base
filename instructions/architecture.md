@@ -59,8 +59,10 @@ void main() => launchApplication(
 ## Build and Codegen
 
 ```bash
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 ```
+
+`build_runner` 2.15+ deletes conflicting outputs by itself; on an older version add `--delete-conflicting-outputs`.
 
 - Localization: add strings to ARB files in `lib/domain/localization/`.
 - Assets: auto-generated in `lib/theme/asset/` via `flutter_gen_runner`.

@@ -178,6 +178,14 @@ final class FeatureThemePro extends ThemeExtension<FeatureThemePro> {
 
 The `_pro` suffix = a custom extension or override of a framework concept. Must be consistent across the entire project.
 
+### Design tokens
+
+Where the theme is generated from Figma design tokens (`figma2flutter` → `lib/theme/asset/tokens.g.dart`; the pipeline, the token groups and the access path are per project — see `project.md`):
+
+- Colors, spacing, radii and text styles come **only from tokens** — no hardcoded values.
+- A new value is added by the designer in Figma and arrives through re-export and regeneration. Never hand-edit `tokens.g.dart` or the generated `tokens.json`.
+- If a value the design needs is missing from the palette, use a literal **with a mandatory** `// TODO(<github-username>):` next to it — what the value is, where it came from (the design), and which token replaces it once the designer adds it. Silently hardcoding around tokens is not allowed.
+
 ---
 
 ## Assets (`assets/`)
@@ -198,3 +206,19 @@ assets/
 - **Never access assets by raw path.** Only via generated constants from `lib/theme/asset/`.
 - Use local fonts — do not rely on online Google Fonts loading.
 - After adding assets — regenerate (see Architecture → *Build and Codegen*).
+
+### Raster densities
+
+Flutter does **not** generate densities automatically. For **raster** assets (PNG) prepare the standard `1x/2x/3x` set; **vector** assets (SVG) need no densities — they scale themselves.
+
+By default do **not** produce `0.5x`/`0.75x`/`1.5x`/`4x` buckets: `0.5`/`0.75` are extinct densities, and `1.5`/`4` Flutter covers with the nearest variant (`2x`/`3x`) plus light scaling. `1x/2x/3x` cover all of iOS and almost all of Android. `4x` is justified only for UI graphics with sharp edges on top-end Android — not for photos/backgrounds.
+
+Export from Figma via MCP (`download_figma_images`), rendering the node at different `pngScale`:
+
+- `pngScale: 1` → base file at the asset folder root (`assets/<...>/image.png`);
+- `pngScale: 2` → `assets/<...>/2.0x/image.png`;
+- `pngScale: 3` → `assets/<...>/3.0x/image.png`.
+
+The file name is identical in every folder. Render the node **without** `imageRef` — that exports the scaled render of the node, not the original (often oversized) fill file.
+
+At runtime Flutter picks the variant by `devicePixelRatio` and decodes only that one; `flutter_gen` (where wired) sees the set as **one** asset with a single generated constant. In `pubspec.yaml` it is enough to declare the asset **folder** — the `2.0x/`, `3.0x/` subfolders are picked up automatically.
