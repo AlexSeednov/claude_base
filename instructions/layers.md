@@ -48,8 +48,21 @@ Reactive event buses (`rxdart` `PublishSubject`) for communication between model
 ### `service/`
 Pure Dart services that don't fit a specific model.
 
+### `event/`
+`sealed` class hierarchies describing what happened — the payloads carried by
+`subject/` buses and by service callbacks. One hierarchy per file, named after
+its base class (`player_event.dart` → `sealed class PlayerEvent`); the variants
+are `final class`es beside it, so a `switch` over them stays exhaustive.
+
+Keep them out of `enum/`: a closed set of *values* is an enum, a closed set of
+*events carrying data* is a sealed hierarchy, and mixing the two in one folder
+hides both. Keep them out of `entity/` too — an entity is data the app stores
+and maps to an API, an event is a moment in time.
+
 ### `enum/`, `extension/`, `mixin/`, `utility/`, `const/`, `localization/`
 Enums, extensions, mixins, helpers, constants, and ARB files respectively.
+Enums only in `enum/` — naming, extensions and JSON rules are in
+Dart Conventions → *Enums*.
 
 ---
 
@@ -62,6 +75,7 @@ Implements repository interfaces from `domain/`. Imports only `domain` and `core
 - `remote/service/` — HTTP client, request/response handling.
 - `remote/entity/` — DTOs for the remote API when they differ from domain entities.
 - `remote/const/` — API paths and endpoint constants.
+- `remote/enum/` — enums owned by the remote source (request token kind, transport modes). An enum used by more than one source belongs in `domain/enum/`.
 - `local/` — repository implementations (`_local` suffix), storage setup, adapters, migrations.
 - `fake/` — fake repository implementations for development and testing.
 
@@ -87,6 +101,9 @@ Imports `domain`, `core`, `theme`. **Never import `data`.**
 - `view_model/` — presentation logic singletons. Mirror the structure of `view/screen/`.
 - `navigation/` — router config (`auto_route`), guards, observers.
 - `service/` — presentation services: network monitoring, loading overlay, clipboard.
+- `enum/` — presentation-only enums (tabs, sections, layout classes), with their
+  extensions in `enum/enum_extension/` — including the extensions that give
+  `domain/` enums their labels and icons.
 - `utility/` — `BuildContext` extensions: `context.loc`, `context.featureTheme`.
 
 ### Screen Lifecycle
