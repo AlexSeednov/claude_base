@@ -112,6 +112,27 @@ short. Two consequences worth knowing:
   not yours — a vendor's own badge or lockup: give it its own group rather than bending an app
   style to fit.
 
+**A master edit is not finished until its instances are checked.** Editing a component — a size,
+a padding, a variant renamed, a variant added — can silently drop overrides in the screens built
+from it: the title an instance had set falls back to the master's placeholder, a hidden slot
+reappears, a swapped icon reverts. Figma reports none of it, and a screen three sections away is
+where you find out. So after every write to a master, **walk its instances and verify each still
+shows what it showed before** — don't stop at the one screen you were working on. Two things make
+this concrete:
+
+- **A cloned variant loses its `componentPropertyReferences`.** `clone()` copies the layers but
+  not their wiring to the set's text / boolean / instance-swap properties, so every instance of
+  the new variant keeps the correct property *value* while rendering the master's placeholder.
+  After cloning a variant, restore the references on each child, comparing against the variant
+  you cloned from.
+- **Check the values, not the pixels.** For every instance, compare its `componentProperties`
+  against what the node actually renders (the text a `TEXT` child holds, whether a referenced
+  layer is visible). A one-pass sweep over the page catches the whole blast radius; a screenshot
+  of the screen you happened to edit does not.
+
+Overrides that are already lost cannot be recovered from the file — reconstruct them from the
+code or the strings the screen uses, and say which ones you had to restore.
+
 Raster exports for the asset densities: see Layers → *Assets* → *Raster densities*.
 
 ## Code Review

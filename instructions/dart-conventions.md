@@ -14,6 +14,100 @@
 2. Follow the repository's existing import style; do not mix `package:` and relative paths.
 3. `// MARK:` sections — only when the file contains the corresponding content. Preferred order: Singleton, Const, References, Notifiers, Data, Base functions, Functions.
 
+## Enums
+
+### Naming and placement
+
+- Every enum ends with `Enum`: `ProductTypeEnum`, `PaymentStatusEnum`,
+  `FieldErrorEnum`. No exception for enums whose name already reads like a type
+  or a status (`TokenType`, `StreamingStatusType`) — the suffix is what tells an
+  enum apart from an entity or a model at the call site. Where the old name
+  carried a redundant noun, drop it instead of stacking:
+  `StreamingStatusEnum`, not `StreamingStatusTypeEnum`.
+- Enums live in an `enum/` folder **at the level that owns them** —
+  `domain/enum/`, `presentation/enum/`, `data/<source>/enum/`. Not in `const/`
+  among real constants, not inline in the file of their only user. The single
+  exception is a **file-private** enum: it cannot leave its file without
+  becoming public, so it stays beside its owner — and still takes the suffix.
+- One enum per file, the file named after it (`product_type_enum.dart` →
+  `ProductTypeEnum`). A file name that drifted from its enum is a rename waiting
+  to happen: the next reader greps the name, not the path.
+- `enum/` holds **enums only**. A sealed class hierarchy is not an enum — see
+  Layers → Domain → `event/`.
+
+### Extensions
+
+- Presentation-side extensions live in `enum/enum_extension/`, one file per
+  enum: `<enum>_enum_ext.dart` → `<Enum>EnumExt`.
+- The human-readable label is always **`text`** — never `title`, `name`,
+  `label`, `designation` or `caption`. One name across every enum means a call
+  site reads the same whichever enum it holds; the synonyms carry no extra
+  meaning and only cost a lookup. Everything else is named after what it
+  returns: `icon`, `image`, `route`, `count(...)`.
+- An enum declared in `domain/` keeps its localized or visual extension in
+  `presentation/` — the domain imports neither Flutter nor localization.
+
+### Enums that cross the API boundary
+
+An enum decoded from a backend payload must survive the backend adding a value.
+`json_serializable` throws on an unknown one, and that exception takes the
+**whole entity** down with it — so decide per field:
+
+- Nullable field plus `unknownEnumValue`, the default answer:
+
+  ```dart
+  @JsonKey(name: 'status', unknownEnumValue: JsonKey.nullForUndefinedEnumValue)
+  final PaymentStatusEnum? status;
+  ```
+
+  The record still parses and `null` means "the backend knows a value we do
+  not". Handle it where the value is rendered — hide the badge, drop the row,
+  keep polling — and say so in the field's doc comment.
+
+- A **list** of enum values needs its own `fromJson`: the annotation covers a
+  single value, so one unknown element still throws. Decode element by element
+  and drop what is unknown:
+
+  ```dart
+  @JsonKey(name: 'meetingFormats', fromJson: _formatListFromJson)
+  final List<ServiceFormatEnum>? formatList;
+
+  ///
+  static List<ServiceFormatEnum>? _formatListFromJson(List<dynamic>? value) =>
+      value
+          ?.map(
+            (e) => $enumDecodeNullable(
+              ServiceFormatEnum.jsonMap,
+              e,
+              unknownValue: JsonKey.nullForUndefinedEnumValue,
+            ),
+          )
+          .nonNulls
+          .toList();
+  ```
+
+  `$enumDecodeNullable` takes the map explicitly, so such an enum carries its
+  own `static const jsonMap` alongside the `@JsonValue` annotations.
+
+- Leaving a field **non-nullable is a deliberate choice**, allowed only where
+  the record is useless without the value — a product whose type decides which
+  screen opens it, a search hit whose type decides which half of the payload to
+  read. There the throw is the feature: the safe-parse helper catches per item,
+  so one unknown record is skipped and logged while the rest of the list
+  survives. Write that reason in the field's doc comment, or the next pass over
+  this rule will "fix" it.
+
+- Enums that only travel **out** — request filters, paging parameters,
+  `createToJson` with no factory — need none of this.
+
+### Stored enums
+
+An enum written to local storage is a schema, not just a name (Packages →
+*Serialization and Storage*). Renaming the class renames the key the generator
+pins the type id to: hand-edit the manifest to keep the old id, or every record
+written under the old name is orphaned. Values are stored by index — add new
+ones **at the end**, never reorder or delete.
+
 ## Singleton Pattern
 
 > The canonical pattern (with a code example) lives in the `claude_base` README,

@@ -5,6 +5,39 @@ All notable changes to this repository are documented here. The format follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). See the README,
 section "Versioning", for what MAJOR / MINOR / PATCH mean here.
 
+## [0.1.4]
+
+### Added
+
+- Global → *Figma*: a rule that **a master edit is not finished until its
+  instances are checked**. Editing a component can silently drop overrides in
+  the screens built from it — a set title falls back to the master's
+  placeholder, a hidden slot reappears, a swapped icon reverts — and Figma
+  reports none of it. Two specifics come with the rule: a variant created with
+  `clone()` loses its `componentPropertyReferences`, so instances keep the right
+  property *value* while rendering the placeholder; and the check is a sweep
+  comparing each instance's `componentProperties` against what it actually
+  renders, not a screenshot of the one screen being edited.
+- Dart Conventions → *Enums*: a section gathering the rules an enum audit keeps
+  re-deriving. Naming (`...Enum`, one per file, the file named after it) and
+  placement (an `enum/` folder at the level that owns the enum, never `const/`,
+  never inline), the `enum_extension/` layout and the single label name `text`
+  instead of the `title`/`name`/`label`/`designation` spread, and what an enum
+  decoded from an API must carry: `unknownEnumValue` on a nullable field, a
+  hand-written `fromJson` for a **list** of values (the annotation covers one
+  value, so one unknown element still throws), the narrow case where staying
+  non-nullable is right and has to be argued in a doc comment, and the fact
+  that outgoing-only enums need none of it. Plus the storage note: renaming a
+  stored enum moves the key its type id is pinned to, so the manifest is
+  hand-edited or the old records are orphaned.
+- Layers → Domain → `event/`: a folder of its own for `sealed` class
+  hierarchies — the payloads of `subject/` buses and service callbacks. They
+  are not enums (a closed set of values) and not entities (data the app stores
+  and maps to an API), and parking them in `enum/` hides both. Naming follows
+  the base class, variants are `final class`es beside it so a `switch` stays
+  exhaustive. `enum/` bullets added to the Data and Presentation layer
+  structures at the same time, so every layer says where its enums live.
+
 ## [0.1.3]
 
 ### Added
