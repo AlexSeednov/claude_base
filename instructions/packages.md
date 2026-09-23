@@ -7,7 +7,7 @@ These packages are the shared foundation for all projects on this stack.
 - **application_base** — shared infrastructure: `getIt`, request/response types (`RequestGet`, `RequestPost`, `RequestDelete`, `ResponseEntity`), `SafeService`, flavor types, `launchApplication()`.
 
 Used in the project (if connected):
-- **firebase_base** — Firebase wrapper: init, Crashlytics, Analytics. Connect only when Firebase is present in the project.
+- **firebase_base** — Firebase wrapper: init, Crashlytics, Cloud Messaging (with foreground pushes on Android shown as local notifications). Connect only when Firebase is present in the project.
 - **metrica_base** — the Yandex counterpart of `firebase_base`: the `AnalyticsService` / `CrashReportingService` contracts with AppMetrica on mobile and the Yandex Metrica counter on the web, `AnalyticsNavigatorObserver` for screen views, `ErrorGroupUtility` for one error grouping on every platform. Connect only when the project reports to Yandex. What stays in the project:
   - **the keys** — AppMetrica API key and Metrica counter number, constants per flavor, handed over as a `MetricaConfig` to `MetricaBase.prepare()` right after DI init (on the web together with the cookie-consent gate, `MetricaConfig.webConsent`);
   - **the events registry** — a `sealed` family on top of the package's `AnalyticsEventBase` (`name`, `parameters`, and `keyActionCounter` for the key actions of the platform). Screen views and the service error event are package types, not registry members. A new event is a new class in the registry — the package never sees a fixed list;

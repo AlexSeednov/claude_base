@@ -54,8 +54,10 @@ Cheap, no judgment needed. Run these with the Grep tool over the chosen slice.
 | `setState` for VM-owned state | `setState\(` | `lib/presentation/` |
 | Hardcoded color | `Color\(0x|Colors\.` | `lib/` outside `lib/theme/` |
 | Hardcoded size / spacing / radius | `fontSize:\s*\d|EdgeInsets\.\w+\(\s*\d|BorderRadius\.circular\(\s*\d` | `lib/` outside `lib/theme/` |
+| Positional insets | `EdgeInsets\.fromLTRB|EdgeInsetsDirectional\.fromSTEB` | `lib/` |
 | Raw asset path | `['"]assets/` | `lib/` outside `lib/theme/asset/` |
 | Hardcoded UI string | `Text\(\s*['"]` | `lib/presentation/` |
+| Pinned formatter locale | `(Date|Number)Format[\w.]*\([^)]*['"][a-z]{2}(_[A-Z]{2})?['"]\)|locale:\s*['"]|Intl\.systemLocale\s*=` | `lib/` |
 | Rethrow discipline | `throw e;|catch \(_\) \{\s*\}` | `lib/` |
 | Logging bypass | `print\(|debugPrint\(` | `lib/` |
 | Deferred-work inventory | `TODO\(|Future\(|FIXME|HACK` | `lib/` |

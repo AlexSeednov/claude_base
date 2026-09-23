@@ -1,3 +1,5 @@
+**English** | [Русский](README.ru.md)
+
 # claude_base
 
 Shared **Claude Code** configuration for Flutter/Dart clean-architecture
@@ -11,12 +13,12 @@ The repository plays two roles at the same time:
 - a store of **always-on instruction files** (`instructions/`) that a project's
   `CLAUDE.md` pulls in with `@import`.
 
-These are two different delivery channels because they carry two different kinds
-of thing. A plugin distributes executable tooling (skills, hooks, commands) and
-updates cleanly through `/plugin update`. Instruction files are always-on context
-and must be `@import`ed into `CLAUDE.md` — a Claude Code plugin does **not** load
-a `CLAUDE.md`, and skills load on demand rather than always. So the same
-repository serves both, through the two mechanisms described below.
+There are two channels because the contents differ. A plugin distributes
+executable tooling (skills, hooks, commands) and updates cleanly through
+`/plugin update`. Instruction files are always-on context and must be
+`@import`ed into `CLAUDE.md`: a Claude Code plugin does **not** load a
+`CLAUDE.md`, and skills load on demand rather than always. So one repository
+serves both channels, through the two mechanisms described below.
 
 ## What is not here
 
@@ -65,7 +67,8 @@ claude_base/
 │   └── layers.md
 ├── CHANGELOG.md
 ├── LICENSE
-└── README.md
+├── README.md
+└── README.ru.md
 ```
 
 ## Quick start
@@ -135,7 +138,7 @@ end with `CLAUDE.md` importing the same file set.
 The first time Claude Code sees an external import in a project it shows a
 one-time approval dialog listing the files.
 
-### Option A — import from a local clone (single source, simplest across machines)
+### Option A — import from a local clone
 
 Clone this repository once per machine to a stable, home-relative path (next to
 your other packages), then import from it. Recommended when you mostly work solo
@@ -162,7 +165,7 @@ Keep the clone path identical across your machines (and for teammates) so the
 `~/`-relative imports resolve everywhere. The project repository alone is not
 self-contained under this option — a fresh checkout needs the clone present.
 
-### Option B — vendor via git subtree (self-contained, best for teams / CI)
+### Option B — vendor via git subtree
 
 Embed a copy of this repository inside the project under `.claude/base/`, so a
 plain `git clone` of the project already contains the instructions (works for
@@ -188,10 +191,10 @@ In each project's `CLAUDE.md`:
 @.claude/project.md
 ```
 
-> A skill in the plugin references instruction files by the project-relative path
-> `.claude/instructions/...`. If you rely on those references, either keep an
-> `instructions` copy at that path or adjust the reference — Option A/B above use
-> `~/...` and `.claude/base/...` respectively.
+> The skills refer to the instructions by file and section name (Dart
+> Conventions → *Singleton Pattern*), never by path: `CLAUDE.md` has already put
+> them in context, and a path would hold for one of the two options only. Either
+> option works with the skills as is.
 
 ## Telegram hooks
 
@@ -220,9 +223,9 @@ several sessions at once stays readable:
 
 Editing this format carries one constraint: the `.ps1` scripts must stay **pure
 ASCII** and build their glyphs from code points (`[char]0x2705`), as they do
-now. Windows PowerShell 5.1 reads a BOM-less script in the system ANSI codepage,
-where a pasted literal glyph can decode into a character that terminates the
-surrounding string and kills the hook with a parser error — this is exactly what
+now. Windows PowerShell 5.1 reads a BOM-less script in the system ANSI codepage.
+A pasted literal glyph can decode there into a character that terminates the
+surrounding string, and the hook dies with a parser error. This is exactly what
 broke every Windows notification in 0.0.3. The `.sh` variants take literals
 as-is.
 
@@ -235,9 +238,9 @@ as-is.
 3. the name of that directory;
 4. `Unknown project`.
 
-Steps 2–3 need no setup at all. Set the variable when the package/folder name is
-not what you want to read on your phone (`cross_stitch` → `Stitchy`) — in the
-`env` block of the project's `.claude/settings.local.json`:
+Steps 2–3 need no setup at all. The variable is for when the package or folder
+name is not what you want to read on your phone (`cross_stitch` → `Stitchy`).
+Set it in the `env` block of the project's `.claude/settings.local.json`:
 
 ```json
 {
@@ -355,17 +358,19 @@ setUp(() {
 ## Versioning
 
 Use **semantic versioning with git tags**, the same convention as the other
-packages on this stack (`application_base`, `firebase_base`). This is the
-recommended answer to "tags, version branches, or changelog?": **tags plus a
-changelog on a single `main` branch — not version-named branches.**
+packages on this stack (`application_base`, `firebase_base`, `metrica_base`).
+This is the recommended answer to "tags, version branches, or changelog?":
+**tags plus a changelog on a single `main` branch — not version-named
+branches.**
 
 Three things move together on each release:
 
 1. **`version` in `plugin/.claude-plugin/plugin.json`** — Claude Code resolves the
    plugin version from this field and uses it for update detection: `/plugin
-   update` only pulls when the string changes. Bump it on every release. (Set the
-   version in `plugin.json` only, never also in the marketplace entry — the
-   manifest value silently wins and a stale one would mask it.)
+   update` only pulls when the string changes. Bump it on every release. Set the
+   version in `plugin.json` only, not in the marketplace entry: the manifest
+   value silently wins, so a version bumped in the marketplace entry alone
+   would be ignored.
 2. **A git tag `vMAJOR.MINOR.PATCH`** — an immutable release marker, matching the
    other packages. It lets a project pin the marketplace or a subtree to an exact
    ref when needed.
@@ -412,10 +417,10 @@ and lives outside the plugin.
   every project that imports from it follows immediately.
 - **Option B (subtree):** one command per project, from its root:
 
-```bash
-GIT_MERGE_AUTOEDIT=no git subtree pull --prefix .claude/base \
-  https://github.com/AlexSeednov/claude_base.git main --squash -m "Claude Base update"
-```
+  ```bash
+  GIT_MERGE_AUTOEDIT=no git subtree pull --prefix .claude/base \
+    https://github.com/AlexSeednov/claude_base.git main --squash -m "Claude Base update"
+  ```
 
   It commits by itself — nothing to do afterwards. `GIT_MERGE_AUTOEDIT=no` and
   `-m` are what keep it to a single command: `git subtree` shells out to a plain
@@ -441,3 +446,6 @@ and `hooks.json` before publishing.
 
 Keep everything in this repository in **English**, and free of any single
 project's names or details — those belong in the consuming project, not the base.
+The one exception is `README.ru.md`, the Russian translation of this README: it
+changes together with it, in the same edit (Global → *Package READMEs: Two
+Languages*).
