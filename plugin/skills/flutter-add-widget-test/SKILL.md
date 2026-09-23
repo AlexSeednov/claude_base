@@ -5,8 +5,8 @@ description: Write component-level widget tests with WidgetTester — verify ren
 
 # Widget tests
 
-For `lib/presentation/` widgets and screens. See `.claude/instructions/layers.md` (Presentation)
-and `project.md` (theme access). Business logic is tested in the unit-test skill, not here.
+For `lib/presentation/` widgets and screens. See Layers → *Presentation Layer* (already in
+context through the project's `CLAUDE.md`) and `project.md` (theme access). Business logic is tested in the unit-test skill, not here.
 
 ## Location & runner
 

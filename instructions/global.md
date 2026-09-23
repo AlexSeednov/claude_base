@@ -42,6 +42,18 @@ read once at session start. **Restart the session** after updating.
 Git writes are the user's call (see *Git: Read-Only*) — hand over the command,
 don't run it.
 
+## Package READMEs: Two Languages
+
+The shared packages — `application_base`, `claude_base`, `firebase_base`,
+`metrica_base` — keep their README in two files: `README.md` in English and
+`README.ru.md` in Russian.
+
+- **`README.md` is the source of truth.** The instructions cite it by section name, "the README wins on any conflict" means the English one, and a disagreement between the two files is settled in its favour. `README.ru.md` is its translation — nothing added, nothing left out.
+- **Every README change lands in both files, in the same change.** A section added, rewritten or removed in one file and not the other is an unfinished edit — that is exactly how a translation falls behind without anyone noticing. Same sections, same order, same content.
+- Code blocks are identical in both files, comments included, so the two can be compared mechanically; identifiers, paths and commands are never translated. Headings are translated, and the anchors of `README.ru.md` point to its own Russian headings. A heading an instruction cites by name keeps the English name in parentheses after the Russian one, so the reference can still be followed.
+- Each file opens with the language switcher — `**English** | [Русский](README.ru.md)` and `[English](README.md) | **Русский**`. GitHub always renders `README.md` and negotiates no language, so without the link nobody finds the other file.
+- Only the README is doubled. `CHANGELOG.md` stays in English, and the rest of the documentation stays in the language it was written for.
+
 ## Logging
 
 - **Every action that could later explain a malfunction must leave a log line**: state-machine and screen-state transitions, navigation (entering/leaving a screen, forced pops), gesture outcomes that drive state, storage writes and their failures, lifecycle commits (flushing on background, banking a session). The bar: a bug report plus the log should be enough to reconstruct what happened, without a debugger.
@@ -51,7 +63,17 @@ don't run it.
 ## Changelog
 
 - After any code change, add a brief line to `changelog.md` in the project root.
-- Write human-readable descriptions of **what changed** (not implementation details). No versions or dates. One line per logical change. Append to the end of the file.
+- Write human-readable descriptions of **what changed** (not implementation details). No versions or dates. One line per logical change. Append to the end of the current branch's section.
+- **Group entries by git branch.** The file outlives a branch switch, so without the branch name nobody can tell which PR an entry shipped in. Every branch owns one section: a `## <branch>` line (the name as `git branch --show-current` prints it), then its entries. Check the current branch before writing. If it has no section yet, append a `---` line and a new `## <branch>` line to the end of the file and put the entry under them. If you came back to a branch that already has a section, add the entry to the end of that section rather than opening a second one.
+
+  ```markdown
+  ## chat_improve
+  - Chats moved to the new API version
+  ---
+  ## search_refactoring
+  - The search field is one shared component on every screen
+  ```
+
 - **CRITICAL**: use only the Edit/Write tools to write to `changelog.md`. **Never use PowerShell/terminal** — on Windows it writes in UTF-16, which corrupts Cyrillic characters in existing entries.
 
 ## Git: Read-Only
@@ -82,6 +104,10 @@ fvm dart <args>
 ```
 
 The pinned Flutter version is defined in `.fvmrc` at the project root. The corresponding Dart SDK version is listed under `environment.sdk` in `pubspec.yaml`.
+
+### Web builds
+
+Every `flutter build web` on this stack carries **`--no-web-resources-cdn`**. By default Flutter loads the CanvasKit engine (and its fallback fonts) from `gstatic.com`, so the IP address of every visitor reaches Google's servers — a cross-border transfer that the operators' Roskomnadzor records declare absent. The flag bundles the engine next to the app. The same rule covers anything else the page would fetch from abroad: fonts are local assets (no runtime `google_fonts`, no Google Fonts `<link>`), and the CSP must not allow `gstatic.com` or `fonts.googleapis.com` — a foreign host allowed there is a sign that something still loads from it. Put the flag everywhere a web build is spelled out: README, Dockerfiles, CI, deploy scripts.
 
 ## Figma
 

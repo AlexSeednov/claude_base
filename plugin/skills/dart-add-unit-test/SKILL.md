@@ -6,7 +6,7 @@ description: Write unit tests for pure-Dart domain/core logic (entities, models,
 # Unit tests (domain / core)
 
 Covers pure-Dart logic in `lib/domain/` and `lib/core/`. UI belongs in the widget-test skill.
-See `.claude/instructions/dart-conventions.md` (Singleton, DI, Lifecycle) and `layers.md`.
+See Dart Conventions (*Singleton Pattern*, *Dependency Injection*, *Lifecycle*) and Layers — both are already in context through the project's `CLAUDE.md`.
 
 ## Location & runner
 
@@ -19,7 +19,8 @@ See `.claude/instructions/dart-conventions.md` (Singleton, DI, Lifecycle) and `l
 ## Dependency injection in tests
 
 Models/VMs are `getIt` singletons whose constructor is `@visibleForTesting` and takes its
-dependencies (see the Singleton pattern in the README). In tests:
+dependencies (see Dart Conventions → *Singleton Pattern* and the `claude_base` README, section
+"Singletons and dependency injection"). In tests:
 
 - **Build the SUT directly** via that constructor with fakes — do **not** pull the SUT from `getIt`.
 - For collaborators the code fetches with `getIt<T>()` internally, register fakes first:

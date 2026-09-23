@@ -5,6 +5,79 @@ All notable changes to this repository are documented here. The format follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). See the README,
 section "Versioning", for what MAJOR / MINOR / PATCH mean here.
 
+## [0.1.5]
+
+### Added
+
+- Global → *Flutter / Dart: Running Commands* → *Web builds*: every
+  `flutter build web` carries `--no-web-resources-cdn`. Flutter otherwise loads
+  CanvasKit from `gstatic.com`, which sends each visitor's IP address to Google
+  — a cross-border transfer the operators' Roskomnadzor records declare absent.
+  The same rule keeps fonts local and keeps `gstatic.com` /
+  `fonts.googleapis.com` out of the CSP, and asks for the flag in every place a
+  web build is written down (README, Dockerfiles, CI, deploy scripts).
+- Layers → *Presentation* → *Widget Rules*: an inset takes the narrowest
+  `EdgeInsets` constructor — `all` (or `zero`), then `symmetric`, otherwise
+  `only` with the sides named; `fromLTRB` and `fromSTEB` are out. All of them
+  are `const` and build the same object, so readability is the whole choice,
+  and four positional numbers read only with the left-top-right-bottom order in
+  mind — an order a mockup's CSS (top-right-bottom-left) does not share. The
+  refactor audit greps for both positional constructors.
+- Global → *Changelog*: entries are grouped by git branch. Each branch owns one
+  `## <branch>` section, a new branch opens its own section after a `---`
+  line, and coming back to a branch adds to the section it already has. The
+  file survives branch switches, so without the name nobody can tell which PR
+  an entry shipped in.
+- Dart Conventions → *Date and Number Formatting*: `DateFormat` and
+  `NumberFormat` take no locale argument. The interface's language reaches
+  `intl` through `ApplicationLocale.resolve` from `application_base` 0.4.3,
+  wired as `localeListResolutionCallback` of the root `MaterialApp`. Left
+  alone, `intl` formats in the device's language — English months and decimal
+  points beside Russian text — and the patches that grew around it, a locale
+  pinned into each call or `Intl.systemLocale` set at launch, either hide the
+  bug or are the bug. The refactor audit greps for both.
+- Global → *Package READMEs: Two Languages*: `application_base`,
+  `claude_base`, `firebase_base` and `metrica_base` keep their README as
+  `README.md` in English — the source of truth the instructions cite — and
+  `README.ru.md`, its Russian translation. Every README change lands in both
+  files in the same edit, since a section changed in one file only is how a
+  translation falls behind unnoticed. Code blocks stay identical, so the two
+  compare mechanically, and each file opens with a language switcher: GitHub
+  renders `README.md` only.
+- `README.ru.md` — the Russian translation of this README. Headings the
+  instructions cite by name keep the English name in parentheses.
+
+### Changed
+
+- Dart Conventions → *Dependency Injection*: the `getit_check` rule follows
+  the tool's new severities (`application_base` 0.4.3). HIGH now means every
+  edge of the cycle is eager — a certain stack overflow — and still has to
+  stay at zero. The fix the rule prescribes, one edge turned into a lazy
+  getter, leaves a MEDIUM cycle, which the rule now names along with the one
+  check it needs: no constructor on the cycle may call a method that takes
+  the lazy edge. Under the old severities that fix never took a cycle out of
+  HIGH.
+- README, both languages: edited for readability. The two delivery options
+  carry short headings, with their trade-offs in the text below; the
+  PowerShell codepage note, the project-name variable and the
+  `plugin.json`-only version rule read as separate sentences instead of one
+  each with a parenthesis or a dash insertion.
+
+### Fixed
+
+- Skills `dart-add-unit-test` and `flutter-add-widget-test` pointed at the
+  instructions through `.claude/instructions/…` — a path neither delivery
+  option uses, so the references led nowhere. They name the file and section
+  now (Dart Conventions → *Singleton Pattern*), which holds for both options:
+  `CLAUDE.md` has put the instructions in context already. The README's
+  warning about that path is rewritten accordingly, and `dart-add-unit-test`
+  no longer sends the reader to a README section that does not exist.
+- Packages → *Internal Infrastructure Packages*: `firebase_base` was listed
+  with Analytics, which it does not have; it carries Cloud Messaging instead.
+- README: *Versioning* names `metrica_base` among the stack's packages and
+  says plainly what the manifest version overrides; the subtree command under
+  *Updating* sits inside its list item again instead of breaking the list.
+
 ## [0.1.4]
 
 ### Added

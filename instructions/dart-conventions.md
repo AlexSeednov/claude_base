@@ -145,7 +145,7 @@ tests). `@lazySingleton` — lazy, `@singleton` — eager; registration is codeg
 - Obtain dependencies via `getIt<T>()`, not through widget constructors.
 - All registration — via `injectable` annotations + codegen. No manual registration.
 - Interface → implementation binding: `@LazySingleton(as: RepositoryInterface)` on the concrete class.
-- After touching DI, check the graph with `fvm dart run application_base:getit_check`: **HIGH** cycles must stay at zero. A cycle is broken by turning one of its edges into a lazy `getIt<T>()` getter with a comment naming the cycle it closes — not by manual registration.
+- After touching DI, check the graph with `fvm dart run application_base:getit_check`: **HIGH** cycles (every edge eager — a certain stack overflow) must stay at zero. A cycle is broken by turning one of its edges into a lazy `getIt<T>()` getter with a comment naming the cycle it closes — not by manual registration. That leaves a **MEDIUM** cycle: make sure no constructor on it calls a method that takes the lazy edge.
 
 ## Navigation
 
@@ -157,6 +157,20 @@ tests). `@lazySingleton` — lazy, `@singleton` — eager; registration is codeg
   `NavigationServiceRouter` implementation, by guards, and by one-off navigation in
   widgets, plus whatever is not in the contract (`unfocus`, `actualContext`,
   `actualRouter`, `pushNamed`, `navigatePath`). Do not use them from a VM.
+
+## Date and Number Formatting
+
+- Format through `intl` (`DateFormat`, `NumberFormat`) **without a locale
+  argument**. The language comes from `ApplicationLocale.resolve`
+  (`application_base`), wired once as `localeListResolutionCallback` of the
+  root `MaterialApp`: it makes the interface's locale the default of `intl`.
+- Never pin a locale into a call (`DateFormat('d MMMM', 'ru')`) and never set
+  `Intl.systemLocale` "for correct formatting". The pin hides the bug and has to
+  be undone for each language added; the system locale *is* the bug —
+  formatters then speak the device's language, not the interface's.
+- A widget test that checks formatted text wires the same callback into its
+  own `MaterialApp` (or sets `Intl.defaultLocale` in `setUp`), otherwise it
+  formats in `en_US`.
 
 ## Error Handling
 
