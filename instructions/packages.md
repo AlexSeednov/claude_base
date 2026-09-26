@@ -29,7 +29,9 @@ These packages change **in their own repositories**, never through a patched loc
 - **hive_ce** / **hive_ce_flutter** — local key-value storage. Stored data must survive every release:
   - where adapters are generated (`hive_ce_generator`), new `AdapterSpec` entries go **at the end only** of `@GenerateAdapters`, and `hive_adapters.g.yaml` — it pins the type and field ids — stays checked in and is never deleted or rebuilt from scratch;
   - box names and storage keys are frozen: renaming one silently orphans the data written under the old name;
-  - a stored field is never renamed, repurposed or changed in type — add a new nullable field with a safe fallback and keep reading the old one; a record that fails to load is skipped and logged, never wiped.
+  - a stored field is never renamed, repurposed or changed in type — add a new nullable field with a safe fallback and keep reading the old one; a record that fails to load is skipped and logged, never wiped;
+  - **no temporary fields.** A stopgap does not go into a stored entity: a local list standing in for state the backend does not keep yet, a flag for a test run. Once it ships, it holds users' data: when the endpoint arrives, that data has to be carried to the server or silently dropped. A feature waiting for an endpoint is built on the contract it waits for — the repository method, the request, the state the response carries — and stays inert behind a `TODO(<github-username>)` until the endpoint exists. A feature that visibly fails beats one that quietly works on a single device. State that really belongs to the device — a preference, a dismissed banner — is not a stopgap;
+  - a field that has never reached a release is removed outright; test devices are no reason to keep it. Removing one is safe: hive_ce addresses fields by index, not by position, and the generator keeps `nextIndex`, so the freed index is never reused and old records still load.
 
 ## UI / Images
 

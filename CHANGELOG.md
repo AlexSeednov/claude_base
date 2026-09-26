@@ -5,6 +5,22 @@ All notable changes to this repository are documented here. The format follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). See the README,
 section "Versioning", for what MAJOR / MINOR / PATCH mean here.
 
+## [0.1.6]
+
+### Added
+
+- Packages → *Serialization and Storage*: no temporary fields in a stored
+  entity. A stopgap for a missing endpoint — a local list standing in for
+  server state, a flag for a test run — holds users' data the moment it ships,
+  and when the endpoint arrives that data has to be carried to the server or
+  silently dropped. The feature is built on
+  the backend contract it waits for and stays inert behind a `TODO` until the
+  endpoint exists: visibly failing beats quietly working on one device. A field
+  that never reached a release is removed outright. That is safe because
+  hive_ce addresses fields by index and the generator keeps `nextIndex`. It
+  also answers the mistaken belief that removing a field shifts the ones after
+  it.
+
 ## [0.1.5]
 
 ### Added
